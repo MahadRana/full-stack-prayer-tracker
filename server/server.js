@@ -14,7 +14,7 @@ app.use('/api/prayers',PrayerRoutes)
 mongoose.connect(process.env.MONG_URI)
     .then(() => {
         //listen for requests 
-        app.listen(process.env.PORT, () => {
+        app.listen(process.env.PORT, '0.0.0.0', () => {
             console.log('listening on port 4000!')
         })
     })
