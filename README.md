@@ -24,7 +24,7 @@ A full-stack application for tracking daily prayer times and statuses, providing
    git clone https://github.com/yourusername/prayer-tracker.git
    cd prayer-tracker
    
-2. Set up your .env file for environment variables, including your MongoDB connection string and any necessary API keys.
+2. Set up your .env file for environment variables, including your MongoDB connection string.
 
 3. Build and run the Docker containers:
    ```bash
