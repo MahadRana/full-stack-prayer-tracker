@@ -4,7 +4,7 @@ A full-stack application for tracking daily prayer times and statuses, providing
 
 ## Features
 
-- Fetches real-time prayer times for your city using a third-party API.
+- Fetches real-time prayer times using a third-party API.
 - Allows users to mark prayers as completed and track daily prayer logs.
 - Displays prayer timings and statuses for multiple days.
 - Built with **React** for the frontend, **Express.js** for the backend, and **MongoDB** for data storage.
