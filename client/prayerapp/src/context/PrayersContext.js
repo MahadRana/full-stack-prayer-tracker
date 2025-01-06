@@ -15,12 +15,12 @@ export const prayerReducer = (state, action) => {
         case 'UPDATE_PRAYER':
             return {
                 prayers: state.prayers.map((prayer) =>
-                    prayer._id === action.payload._id ? { ...prayer, ...action.payload } : prayer
+                    prayer.id === action.payload.id ? { ...prayer, ...action.payload } : prayer
                 )
             }
         case 'DELETE_PRAYER':
             return {
-                prayers: state.prayers.filter((prayer) => prayer._id !== action.payload._id)
+                prayers: state.prayers.filter((prayer) => prayer.id !== action.payload.id)
             }
         default: 
             return state

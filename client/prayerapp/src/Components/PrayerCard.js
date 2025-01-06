@@ -8,16 +8,10 @@ const PrayerCard = ({prayerData}) => {
         const [maghrib, setMaghrib] = useState(prayerData.maghrib_checked)
         const [isha, setIsha] = useState(prayerData.isha_checked)
 
-        const updatePrayers = async () => {
-                const response = await fetch('/api/prayers/'+prayerData._id, {
+        const updatePrayers = async (updatedData) => {
+                const response = await fetch('/api/prayers/'+prayerData.id, {
                         method: 'PATCH',
-                        body: JSON.stringify({
-                                fajr_checked: prayerData.fajr_checked,
-                                dhuhr_checked: prayerData.dhuhr_checked,
-                                asr_checked: prayerData.asr_checked,
-                                maghrib_checked: prayerData.maghrib_checked,
-                                isha_checked: prayerData.isha_checked,
-                            }),
+                        body: JSON.stringify(updatedData),
                         headers: {
                             'Content-Type': 'application/json'
                         }
@@ -29,40 +23,22 @@ const PrayerCard = ({prayerData}) => {
                         dispatch({type: 'UPDATE_PRAYER', payload:json})
                 }
         }
-        const isChecked = (prayer_checked) => {
-                return prayer_checked ? "checked" : ""
-        }
+        const handleCheckboxChange = async (prayer, setFunc, event) => {
+                const newCheckedValue = event.target.checked ? 1 : 0; 
+                setFunc(newCheckedValue);
 
-        const handleCheckboxChangeFajr = async (event) => {
-                // Toggle the checked state
-                setFajr(event.target.checked);
-                prayerData.fajr_checked = !fajr;
-                await updatePrayers()
-        }
+                const updatedData = {
+                        fajr_checked: prayerData.fajr_checked,
+                        dhuhr_checked: prayerData.dhuhr_checked,
+                        asr_checked: prayerData.asr_checked,
+                        maghrib_checked: prayerData.maghrib_checked,
+                        isha_checked: prayerData.isha_checked,
+                        [`${prayer}_checked`]: newCheckedValue
+                };
 
-        const handleCheckboxChangeDhuhr = async (event) => {
-                // Toggle the checked state
-                setDhuhr(event.target.checked);
-                prayerData.dhuhr_checked = !dhuhr;
-                await updatePrayers()
-        }
-        const handleCheckboxChangeAsr = async (event) => {
-                // Toggle the checked state
-                setAsr(event.target.checked);
-                prayerData.asr_checked = !asr;
-                await updatePrayers()
-        }
-        const handleCheckboxChangeMaghrib = async (event) => {
-                // Toggle the checked state
-                setMaghrib(event.target.checked);
-                prayerData.maghrib_checked = !maghrib;
-                await updatePrayers()
-        }
-        const handleCheckboxChangeIsha = async(event) => {
-                // Toggle the checked state
-                setIsha(event.target.checked);
-                prayerData.isha_checked = !isha;
-                await updatePrayers()
+                console.log(updatedData)
+                
+                await updatePrayers(updatedData);
         }
 
         return(
@@ -75,35 +51,35 @@ const PrayerCard = ({prayerData}) => {
                         <li key='Fajr'>
                                 <strong>Fajr:</strong> {prayerData.fajr_timing}
                                 <label className="container">
-                                        <input type="checkbox" checked={isChecked(fajr)} onChange={handleCheckboxChangeFajr}/>
+                                        <input type="checkbox" checked={fajr === 1} onChange={(event) => handleCheckboxChange("fajr", setFajr, event)}/>
                                         <span className="checkmark"></span>
                                 </label>
                         </li>
                         <li key='Dhuhr'>
                                 <strong>Dhuhr:</strong> {prayerData.dhuhr_timing}
                                 <label className="container">
-                                        <input type="checkbox" checked={isChecked(dhuhr)} onChange={handleCheckboxChangeDhuhr}/>
+                                        <input type="checkbox" checked={dhuhr === 1} onChange={(event) => handleCheckboxChange("dhuhr", setDhuhr, event)}/>
                                         <span className="checkmark"></span>
                                 </label>
                         </li>
                         <li key='Asr'>
                                 <strong>Asr:</strong> {prayerData.asr_timing}
                                 <label className="container">
-                                        <input type="checkbox" checked={isChecked(asr)} onChange={handleCheckboxChangeAsr}/>
+                                        <input type="checkbox" checked={asr === 1} onChange={(event) => handleCheckboxChange("asr", setAsr, event)}/>
                                         <span className="checkmark"></span>
                                 </label>
                         </li>
                         <li key='Maghrib'>
                                 <strong>Maghrib:</strong> {prayerData.maghrib_timing}
                                 <label className="container">
-                                        <input type="checkbox" checked={isChecked(maghrib)} onChange={handleCheckboxChangeMaghrib}/>
+                                        <input type="checkbox" checked={maghrib === 1} onChange={(event) => handleCheckboxChange("maghrib", setMaghrib, event)}/>
                                         <span className="checkmark"></span>
                                 </label>
                         </li>
                         <li key='Isha'>
                                 <strong>Isha:</strong> {prayerData.isha_timing}
                                 <label className="container">
-                                        <input type="checkbox" checked={isChecked(isha)} onChange={handleCheckboxChangeIsha}/>
+                                        <input type="checkbox" checked={isha === 1} onChange={(event) => handleCheckboxChange("isha", setIsha, event)}/>
                                         <span className="checkmark"></span>
                                 </label>
                         </li>
