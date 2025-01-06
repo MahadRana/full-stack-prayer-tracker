@@ -1,5 +1,4 @@
-const Prayer = require('../models/prayerModel')
-const mongoose = require('mongoose')
+const pool = require('../database/database')
 
 const getPrayerData = async (currentDate) =>{
     //30-08-2024
@@ -19,8 +18,8 @@ const getPrayerData = async (currentDate) =>{
 
 const getPrayers = async (req,res) => {
     try{
-        const prayers = await Prayer.find({}).sort({createdAt: -1})
-        res.status(200).json(prayers)
+        const [prayers] = await pool.query("SELECT * FROM prayer_track ORDER BY createdAt DESC")
+        res.status(200).json(prayers);
     } catch (error){
         res.status(400).json({error:error.message})
     }
@@ -29,26 +28,33 @@ const getPrayers = async (req,res) => {
 const postPrayers = async (req,res) => {
     try{
         const { date } = req.body;
+        //get data from API using getPrayerData func
         const prayerData = await getPrayerData(date)
         if(!prayerData){
             throw Error("Data could not be fetched from API")
         }
+        //insert into database
+        const query = `
+        INSERT INTO prayer_track (
+            gregorian_date, hijri_date, fajr_timing, dhuhr_timing, 
+            asr_timing, maghrib_timing, isha_timing
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-        let prayer = await Prayer.create({
-            gregorian_date: prayerData.date.gregorian.date,
-            hijri_date:prayerData.date.hijri.date,
-            fajr_checked: false,
-            fajr_timing: prayerData.timings.Fajr, 
-            dhuhr_checked: false, 
-            dhuhr_timing: prayerData.timings.Dhuhr, 
-            asr_checked: false, 
-            asr_timing: prayerData.timings.Asr, 
-            maghrib_checked: false, 
-            maghrib_timing: prayerData.timings.Maghrib, 
-            isha_checked: false,
-            isha_timing: prayerData.timings.Isha
-        })
-        res.status(200).json(prayer)
+        const values = [
+            prayerData.date.gregorian.date,
+            prayerData.date.hijri.date,
+            prayerData.timings.Fajr,
+            prayerData.timings.Dhuhr,
+            prayerData.timings.Asr,
+            prayerData.timings.Maghrib,
+            prayerData.timings.Isha,
+        ];
+
+        const [result] = await pool.query(query,values)
+        const id = result.insertId
+
+        const [updated] = await pool.query("SELECT * FROM prayer_track WHERE id = ?", [id]);
+        res.status(200).json(updated[0]);
     } catch (error) {
         res.status(400).json({error:error.message})
     }
@@ -56,34 +62,43 @@ const postPrayers = async (req,res) => {
 
 const updatePrayer = async (req,res) => {
     const {id} = req.params
-
-    if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({error: 'Invalid ID'})
+    try{
+        //ensure prayer in database
+        const [row] = await pool.query("SELECT * FROM prayer_track WHERE id=?", [id])
+        if (row.length === 0) {
+            return res.status(404).json({error: 'Invalid ID'})
+        }
+        //update query
+        const query = `
+        UPDATE prayer_track
+        SET fajr_checked = ?, dhuhr_checked = ?, asr_checked = ?, 
+            maghrib_checked = ?, isha_checked = ?
+        WHERE id = ?`;
+        const values = [...req.body, id]
+        await pool.query(query,values)
+        //return prayer to frontend
+        const [updated] = await pool.query("SELECT * FROM prayer_track WHERE id = ?", [id]);
+        res.status(200).json(updated[0]);
+    } catch (error){
+        return res.status(500).json({error:error.message})
     }
-
-    const prayer = await Prayer.findOneAndUpdate({_id:id}, 
-        {...req.body}, {new:true}
-    )
-    if(!prayer){
-        return res.status(404).json({error: 'Could not update prayers'})
-    }
-
-    res.status(200).json(prayer)
 }
 
 const deletePrayer = async(req,res) => {
     const {id} = req.params
+    try{
+        //ensure prayer in database
+        const [row] = await pool.query("SELECT * FROM prayer_track WHERE id=?", [id])
+        if (row.length === 0) {
+            return res.status(404).json({error: 'Invalid ID'})
+        }
 
-    if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({error: 'Invalid ID'})
+        const query = "DELETE FROM prayer_track WHERE id = ?";
+        await pool.query(query, [id]);
+        return res.status(200).json(row[0])
+    } catch (error){
+        return res.status(500).json({error:error.message})
     }
-
-    const prayer = await Prayer.findOneAndDelete({_id:id})
-
-    if(!prayer){
-        return res.status(404).json({error:'No such prayer'})
-    }
-    return res.status(200).json(prayer)
 }
 
 module.exports = {

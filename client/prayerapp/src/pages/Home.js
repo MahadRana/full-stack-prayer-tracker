@@ -61,26 +61,50 @@ const Home = () => {
             }
         }
 
-        const postDaily = async() => {
-            const date = new Date()
-            const obj = {day:date.getDate(), month:date.getMonth()+1, year:date.getFullYear()}
-            postPrayers(obj)
-        }
+        const postDaily = async () => {
+            const date = new Date();
+            const formattedDate = {
+                day: date.getDate(),
+                month: date.getMonth() + 1,
+                year: date.getFullYear(),
+            };
+
+            const formattedToday = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        
+            // Check if today's prayer already exists in `prayers`
+            const existingPrayer = prayers?.find(prayer => prayer.gregorian_date === formattedToday);
+        
+            if (existingPrayer) {
+                console.log('Prayer for today already exists:', formattedToday);
+                return; // Prevent duplicate posting
+            }
+        
+        
+            await postPrayers(formattedDate);
+        };
 
         const handleMissingDays = async () => {
-            if (!prayers || prayers.length === 0) {
+            if (!prayers) {
                 return; // No prayers to handle
+            } else if (prayers.length === 0){
+                const date = new Date();
+                const formattedDate = {
+                    day: date.getDate(),
+                    month: date.getMonth() + 1,
+                    year: date.getFullYear(),
+                };
+                await postPrayers(formattedDate);
+                return;
             }
-    
+            
             // Convert the latest prayer date to a JavaScript Date object
             const latestPrayerDate = convertToDateObject(prayers[0].gregorian_date);
-            console.log('format:', convertToDateObject(prayers[0].gregorian_date))
-            console.log('prayers:',prayers)
             const currentDate = new Date();
-            console.log('latestPrayerDate:',latestPrayerDate)
             // Calculate the number of missing days
             const missingDays = Math.floor((currentDate - latestPrayerDate) / (1000 * 60 * 60 * 24));
             // Loop through each missing day and post prayers
+            if (missingDays <= 0) return; // Avoid unnecessary posting if no days are missing
+
             for (let i = 1; i <= missingDays; i++) {
                 const missingDate = new Date(latestPrayerDate);
                 missingDate.setDate(latestPrayerDate.getDate() + i);
@@ -94,7 +118,6 @@ const Home = () => {
             }
         };
         handleMissingDays()
-        postDaily()
         const now = new Date();
         const midnight = new Date(
           now.getFullYear(),
@@ -129,4 +152,4 @@ const Home = () => {
     )
 }
 
-export default Home; 
+export default Home;

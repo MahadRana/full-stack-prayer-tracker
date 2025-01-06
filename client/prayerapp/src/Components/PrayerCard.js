@@ -11,7 +11,13 @@ const PrayerCard = ({prayerData}) => {
         const updatePrayers = async () => {
                 const response = await fetch('/api/prayers/'+prayerData._id, {
                         method: 'PATCH',
-                        body: JSON.stringify(prayerData),
+                        body: JSON.stringify({
+                                fajr_checked: prayerData.fajr_checked,
+                                dhuhr_checked: prayerData.dhuhr_checked,
+                                asr_checked: prayerData.asr_checked,
+                                maghrib_checked: prayerData.maghrib_checked,
+                                isha_checked: prayerData.isha_checked,
+                            }),
                         headers: {
                             'Content-Type': 'application/json'
                         }
