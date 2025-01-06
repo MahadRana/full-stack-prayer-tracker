@@ -68,14 +68,25 @@ const Home = () => {
                 month: date.getMonth() + 1,
                 year: date.getFullYear(),
             };
+            let day = '';
+            let month = '';
+            if (date.getDate()<10){
+                day = `0${formattedDate.day}`
+            } else{
+                day = `${formattedDate.day}`
+            }
+            if ((date.getMonth()+1) < 10){
+                month = `0${formattedDate.month}`
+            } else{
+                month = `${formattedDate.month}`
+            }
 
-            const formattedToday = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+            const formattedToday = `${day}-${month}-${formattedDate.year}`;
         
             // Check if today's prayer already exists in `prayers`
             const existingPrayer = prayers?.find(prayer => prayer.gregorian_date === formattedToday);
         
             if (existingPrayer) {
-                console.log('Prayer for today already exists:', formattedToday);
                 return; // Prevent duplicate posting
             }
         
