@@ -22,6 +22,10 @@ export const prayerReducer = (state, action) => {
             return {
                 prayers: state.prayers.filter((prayer) => prayer.id !== action.payload.id)
             }
+        case 'SORT_PRAYER':
+            return {
+                prayers: [...state.prayers].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            }
         default: 
             return state
     }
