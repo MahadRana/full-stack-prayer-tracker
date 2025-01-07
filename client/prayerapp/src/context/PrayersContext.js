@@ -2,6 +2,14 @@ import { createContext, useReducer } from "react";
 
 export const PrayersContext = createContext()
 
+const convertToDateObject = (dateString) => {
+    // Split the string by '-' to get day, month, and year separately
+    const [day, month, year] = dateString.split('-');
+    return new Date(Number(year), Number(month)-1, Number(day));
+    // Return a new Date object with 'YYYY-MM-DD' format
+    
+};
+
 export const prayerReducer = (state, action) => {
     switch (action.type){
         case 'SET_PRAYERS':
@@ -24,7 +32,7 @@ export const prayerReducer = (state, action) => {
             }
         case 'SORT_PRAYER':
             return {
-                prayers: [...state.prayers].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                prayers: [...state.prayers].sort((a, b) => convertToDateObject(b.gregorian_date) - convertToDateObject(a.gregorian_date))
             }
         default: 
             return state
