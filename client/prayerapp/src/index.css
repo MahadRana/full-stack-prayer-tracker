@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 .Home {
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap:10px;
-    align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between; /* This centers the grid horizontally */
+  margin: 0 auto; /* Optional: Ensures no extra margins */
 }
 
 .card {
@@ -16,8 +18,13 @@
     font-family:'Poppins';
 }
 
-body{
-    background-color: #e5e5e5;
+body {
+  background-color: #e5e5e5;
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  min-height: 100vh; /* Ensures the body spans the full viewport height */
+  margin: 0; /* Removes default margins */
 }
 
 .dates {
@@ -49,14 +56,26 @@ ul {
 
 
 @media (max-width: 650px) {
-    .Home {
-        grid-template-columns: 1fr;
-    }
+  .Home {
+      grid-template-columns: 1fr; /* Single column for small screens */
+  }
 }
 
-@media (min-width:651px) and (max-width: 1000px) {
+@media (min-width: 651px) and (max-width: 1000px) {
   .Home {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr; /* Two columns for medium-sized screens */
+  }
+}
+
+@media (min-width: 1001px) and (max-width: 1350px) {
+  .Home {
+      grid-template-columns: 1fr 1fr 1fr; /* Three columns for larger screens */
+  }
+}
+
+@media (min-width: 1351px) {
+  .Home {
+      grid-template-columns: 1fr 1fr 1fr 1fr; /* Four columns for very large screens */
   }
 }
 
